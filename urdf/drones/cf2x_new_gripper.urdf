@@ -1,0 +1,352 @@
+<?xml version="1.0" ?>
+
+<robot name="cf2_new_gripper">
+
+  <properties arm="0.0397" kf="3.16e-10" km="7.94e-12" thrust2weight="2.25" max_speed_kmh="30" gnd_eff_coeff="11.36859" prop_radius="2.31348e-2" drag_coeff_xy="9.1785e-7" drag_coeff_z="10.311e-7" dw_coeff_1="2267.18" dw_coeff_2=".16" dw_coeff_3="-.11" />
+
+  <link name="base_link"> 
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.027"/>
+      <inertia ixx="1.4e-5" ixy="0.0" ixz="0.0" iyy="1.4e-5" iyz="0.0" izz="2.17e-5"/>
+    </inertial>
+
+    <!-- links>
+      <carlos url="https://arxiv.org/pdf/1608.05786.pdf" />
+      <julian url="https://www.research-collection.ethz.ch/handle/20.500.11850/214143" />
+      <mit url="http://groups.csail.mit.edu/robotics-center/public_papers/Landry15.pdf" />
+    </links -->
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="./body.obj" scale="1 1 1"/>
+      </geometry> 
+      <material name="grey">
+        <color rgba=".5 .5 .5 1"/>
+      </material> 
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius=".06" length=".025"/>
+      </geometry>
+    </collision>  
+
+  </link>
+
+  <link name="prop0_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.028 -0.028 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0.0323 -0.0323 0.0132"/>
+      <geometry>
+          <mesh filename="./propeller0.obj"/>
+      </geometry> 
+    </visual>
+
+  </link>
+  <joint name="prop0_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="prop0_link"/>
+  </joint>
+
+  <link name="prop1_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.028 -0.028 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.0323 -0.0323 0.0132"/>
+      <geometry>
+          <mesh filename="./propeller1.obj"/>
+      </geometry> 
+    </visual>
+  </link>
+  <joint name="prop1_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="prop1_link"/>
+  </joint>
+
+  <link name="prop2_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.028 0.028 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="-0.0323 0.0323 0.0132"/>
+      <geometry>
+          <mesh filename="./propeller2.obj"/>
+      </geometry> 
+    </visual>
+  </link>
+  <joint name="prop2_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="prop2_link"/>
+  </joint>
+
+  <link name="prop3_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.028 0.028 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0.0323 0.0323 0.0132"/>
+      <geometry>
+          <mesh filename="./propeller3.obj"/>
+      </geometry> 
+    </visual>
+  </link>
+  <joint name="prop3_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="prop3_link"/>
+  </joint>
+
+  <link name="center_of_mass_link">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
+  </link>
+  <joint name="center_of_mass_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="center_of_mass_link"/>
+  </joint>
+  
+  <link name="gripper_base_link">
+    <inertial>
+      <!--
+        그리퍼 전체 질량을 0.01kg 정도로 가정.
+        이 링크 자체의 origin은 joint origin에서 상대적으로 표현됩니다.
+      -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <!--
+        gripper_base_link는 가로·세로 0.04×0.02m, 높이 0.02m 정도의 작은 박스로 근사.
+        관성은 적절히 축소하여 대략적인 값으로 설정.
+      -->
+      <inertia
+        ixx="1e-7" ixy="0.0" ixz="0.0"
+        iyy="1e-7" iyz="0.0"
+        izz="1e-7"/>
+    </inertial>
+    <visual>
+      <!--
+        origin을 (0,0,0)으로 두고, joint를 통해 실제 위치를 지정합니다.
+      -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Fixed Joint: base_link → gripper_base_link (드론 아래쪽으로) -->
+  <joint name="joint_base_to_gripper_base" type="fixed">
+    <parent link="base_link"/>
+    <!--
+      gripper_base_link이 드론 본체 바로 아래로 내려오도록 origin을 음수 Z 값으로 설정:
+      - 드론 바디 충돌실린더 길이 절반 = 0.0125m
+      - 그리퍼 베이스 높이 절반 = 0.01m
+      → 합 ≈ 0.0225m 정도.
+      예시에서는 좀 더 여유를 두어 −0.04m 로 설정했습니다(필요 시 조절).
+    -->
+    <origin xyz="0 0 -0.01" rpy="0 0 0"/>
+    <child  link="gripper_base_link"/>
+  </joint>
+
+  <link name="grip_upper_left_arm">
+    <inertial>
+      <!-- 질량 0.004kg, 길이 0.04m(박스 길이), 단면 0.01×0.01m 가정 -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia
+        ixx="5e-8" ixy="0.0" ixz="0.0"
+        iyy="5e-8" iyz="0.0"
+        izz="2.5e-8"/>
+    </inertial>
+    <visual>
+      <!--
+        gripper_base_link의 (0,0,0)에서 z=+0.01m(베이스 높이 절반) 위치가 상단 팔 회전축:
+        origin을 (−0.02, 0, +0.01)으로 두고, 45° 기울여 x축 음방향으로 0.04m 뻗음.
+      -->
+      <origin xyz="-0.01 0 0" rpy="0 -3.927 0"/>
+      <geometry>
+        <box size="0.02 0.005 0.005"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.01 0 0" rpy="0 -3.927 0"/>
+      <geometry>
+        <box size="0.02 0.005 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Fixed Joint: gripper_base_link → grip_upper_left_arm -->
+  <joint name="joint_grip_base_to_upper_left" type="revolute">
+    <parent link="gripper_base_link"/>
+    <!--
+      origin을 (0,0,0.01)으로 두면 visual에서 정의한 rpy=45° 기울기가 적용됩니다.
+      최종 상단 팔의 “회전축” 위치는 gripper_base_link에서 z=+0.01m 상단부가 됩니다.
+    -->
+    <origin xyz="0 0 -0.01" rpy="0 0 0"/>
+    <child  link="grip_upper_left_arm"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="0.5" velocity="5.0" lower="-1.57" upper="1.57"/>
+  </joint>
+
+  <link name="grip_upper_right_arm">
+    <inertial>
+      <!-- 질량 0.004kg, 길이 0.04m, 단면 0.01×0.01m -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia
+        ixx="5e-8" ixy="0.0" ixz="0.0"
+        iyy="5e-8" iyz="0.0"
+        izz="2.5e-8"/>
+    </inertial>
+    <visual>
+      <!--
+        gripper_base_link의 (0,0,+0.01)에서 x축 양방향 0.02m 떨어진 지점.
+        origin (0.02, 0, +0.01), rpy (0, −0.7854, 0) 으로 45° 기울임.
+      -->
+      <origin xyz="0.01 0 0" rpy="0 0.7854 0"/>
+      <geometry>
+        <box size="0.02 0.005 0.005"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.01 0 0" rpy="0 0.7854 0"/>
+      <geometry>
+        <box size="0.02 0.005 0.005"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Fixed Joint: gripper_base_link → grip_upper_right_arm -->
+  <joint name="joint_grip_base_to_upper_right" type="revolute">
+    <parent link="gripper_base_link"/>
+    <!--
+      상단 팔 회전축 역시 (0,0,+0.01)에 위치하도록 origin xyz="0 0 0.01" 로 설정.
+    -->
+    <origin xyz="0 0 -0.01" rpy="0 0 0"/>
+    <child  link="grip_upper_right_arm"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="5.0" lower="-1.57" upper="1.57"/>
+  </joint>
+
+  <link name="grip_lower_left_finger">
+    <inertial>
+      <!-- 질량 0.002kg, 길이 0.04m, 단면 0.01×0.01m -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia
+        ixx="5e-8" ixy="0.0" ixz="0.0"
+        iyy="5e-8" iyz="0.0"
+        izz="2.5e-8"/>
+    </inertial>
+    <visual>
+      <!--
+        upper_left_arm 끝(−0.02,0,+0.01)에서 바로 아래(−0.02,0,0)로 finger 시작.
+      -->
+      <origin xyz="-0.007 0 -0.013" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.005 0.005 0.025"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.007 0 -0.013" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.005 0.005 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Revolute Joint: grip_upper_left_arm → grip_lower_left_finger -->
+  <joint name="joint_upper_left_to_lower_left" type="revolute">
+    <parent link="grip_upper_left_arm"/>
+    <child  link="grip_lower_left_finger"/>
+    <!--
+      회전축: Y축 기준.
+      origin 을 (0,0, −0.01)으로 두면, 
+      upper_left_arm 끝(−0.02,0,+0.01)에서 −0.01 내려온 지점(−0.02,0,0)이 회전축이 됩니다.
+    -->
+    <origin xyz="-0.01 0 -0.004" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="0.5" velocity="5.0" lower="-1.57" upper="1.57"/>
+  </joint>
+
+  <link name="grip_lower_right_finger">
+    <inertial>
+      <!-- 질량 0.002kg, 길이 0.04m, 단면 0.01×0.01m -->
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia
+        ixx="5e-8" ixy="0.0" ixz="0.0"
+        iyy="5e-8" iyz="0.0"
+        izz="2.5e-8"/>
+    </inertial>
+    <visual>
+      <!--
+        upper_right_arm 끝(0.02,0,+0.01)에서 바로 아래(0.02,0,0)로 finger 시작.
+      -->
+      <origin xyz="0.007 0 -0.013" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.005 0.005 0.025"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.007 0 -0.013" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.005 0.005 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Revolute Joint: grip_upper_right_arm → grip_lower_right_finger -->
+  <joint name="joint_upper_right_to_lower_right" type="revolute">
+    <parent link="grip_upper_right_arm"/>
+    <child  link="grip_lower_right_finger"/>
+    <!--
+      회전축: Y축 기준.
+      origin 을 (0,0, −0.01)으로 두면,
+      upper_right_arm 끝(0.02,0,+0.01)에서 −0.01 내려온 지점(0.02,0,0)이 회전축이 됩니다.
+    -->
+    <origin xyz="0.01 0 -0.004" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="10" velocity="5.0" lower="-1.57" upper="1.57"/>
+  </joint>
+  
+</robot>
+
